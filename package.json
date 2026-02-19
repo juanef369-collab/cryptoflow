@@ -16,6 +16,6 @@
   },
   "scripts": {
     "start": "npx servor . index.html 8080 --browse",
-    "build": "echo 'No build step needed for ESM imports'"
+    "build": "mkdir -p public && cp -r index.html index.tsx App.tsx types.ts constants.tsx metadata.json services components public/"
   }
 }
