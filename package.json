@@ -1,0 +1,21 @@
+
+{
+  "name": "cryptoflow-jp",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "@google/genai": "^1.41.0",
+    "recharts": "^3.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "npx servor . index.html 8080 --browse",
+    "build": "echo 'No build step needed for ESM imports'"
+  }
+}

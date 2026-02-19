@@ -1,0 +1,7 @@
+{
+  "name": "CryptoFlow JP - AI Crypto Intelligence",
+  "description": "A high-traffic crypto intelligence dashboard with AI-driven market analysis, live charts, and portfolio tools designed for the Japanese market.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

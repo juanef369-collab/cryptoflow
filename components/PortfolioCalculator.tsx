@@ -1,0 +1,70 @@
+
+import React, { useState } from 'react';
+
+const PortfolioCalculator: React.FC = () => {
+  const [investment, setInvestment] = useState<number>(100000);
+  const [entryPrice, setEntryPrice] = useState<number>(6500000);
+  const [exitPrice, setExitPrice] = useState<number>(7000000);
+
+  const profit = ((investment / entryPrice) * exitPrice) - investment;
+  const roi = (profit / investment) * 100;
+
+  return (
+    <div className="glass rounded-2xl p-6">
+      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <i className="fas fa-calculator text-blue-400"></i>
+        収益計算シミュレーター
+      </h3>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">投資額 (JPY)</label>
+          <input 
+            type="number" 
+            value={investment}
+            onChange={(e) => setInvestment(Number(e.target.value))}
+            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">購入価格 (JPY)</label>
+            <input 
+              type="number" 
+              value={entryPrice}
+              onChange={(e) => setEntryPrice(Number(e.target.value))}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">目標価格 (JPY)</label>
+            <input 
+              type="number" 
+              value={exitPrice}
+              onChange={(e) => setExitPrice(Number(e.target.value))}
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 p-4 bg-blue-600/10 border border-blue-500/20 rounded-xl">
+          <div className="flex justify-between items-end mb-2">
+            <span className="text-sm text-slate-400">見込み利益</span>
+            <span className={`text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ¥{Math.round(profit).toLocaleString()}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-slate-400">ROI (投資利益率)</span>
+            <span className={`text-lg font-bold ${roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {roi.toFixed(2)}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PortfolioCalculator;
