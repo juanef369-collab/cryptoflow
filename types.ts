@@ -17,9 +17,8 @@ export interface NewsItem {
   source: string;
   publishedAt: string;
   sentiment?: 'positive' | 'neutral' | 'negative';
-  // Se cambia a obligatorio para evitar errores al acceder a .length
   summary: string;
-  // Se añade la propiedad que faltaba
+  actionableInsight?: string;
   isEnhanced?: boolean;
 }
 

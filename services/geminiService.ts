@@ -106,7 +106,7 @@ export const getMarketAnalysis = async (coinName: string, priceData: string): Pr
 };
 
 export const fetchLatestNews = async (): Promise<NewsItem[]> => {
-  const cacheKey = 'latest_news_v2';
+  const cacheKey = 'latest_news_v3';
   const cached = getCache<NewsItem[]>(cacheKey);
   if (cached) return cached;
 
@@ -114,26 +114,46 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
     const news = await runSerialized<NewsItem[]>(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: "最新の仮想通貨ニュース、特に日本市場に関連するものを5つ。日本語で。",
-        config: { tools: [{ googleSearch: {} }] }
+        contents: "日本市場に関連する最新の仮想通貨ニュースを5つ取得してください。各ニュースについて、以下の情報を日本語で提供してください：\n1. タイトル\n2. 非常に簡潔な要約（60文字以内）\n3. 日本の投資家向けの具体的なアクションや影響（40文字以内）\n4. ソース名とURL\n5. 市場へのセンチメント（positive, neutral, negative）",
+        config: { 
+          tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                summary: { type: Type.STRING },
+                actionableInsight: { type: Type.STRING },
+                url: { type: Type.STRING },
+                source: { type: Type.STRING },
+                sentiment: { type: Type.STRING, enum: ["positive", "neutral", "negative"] }
+              },
+              required: ["title", "summary", "actionableInsight", "url", "source", "sentiment"]
+            }
+          }
+        }
       });
-      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      const text = response.text || "";
-      const lines = text.split('\n').filter(l => l.length > 40).slice(0, 5);
 
-      return lines.map((line, index) => ({
+      const parsedNews = JSON.parse(response.text || "[]");
+      
+      return parsedNews.map((item: any, index: number) => ({
         id: `news-${index}-${Date.now()}`,
-        title: line.substring(0, 80).split('：')[0],
-        summary: line,
-        url: (chunks[index] as any)?.web?.uri || "https://jp.cointelegraph.com/",
-        source: (chunks[index] as any)?.web?.title || "AI Market Feed",
+        title: item.title,
+        summary: item.summary,
+        actionableInsight: item.actionableInsight,
+        url: item.url || "https://jp.cointelegraph.com/",
+        source: item.source || "AI Market Feed",
+        sentiment: item.sentiment || "neutral",
         publishedAt: new Date().toISOString(),
-        isEnhanced: false
+        isEnhanced: true
       }));
     }));
     setCache(cacheKey, news);
     return news;
-  } catch {
+  } catch (error) {
+    console.error("Error fetching news:", error);
     return [];
   }
 };
