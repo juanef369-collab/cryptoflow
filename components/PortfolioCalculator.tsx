@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 
 const PortfolioCalculator: React.FC = () => {
+  const [currency, setCurrency] = useState<'JPY' | 'USD'>('JPY');
   const [investment, setInvestment] = useState<number>(100000);
   const [entryPrice, setEntryPrice] = useState<number>(6500000);
   const [exitPrice, setExitPrice] = useState<number>(7000000);
@@ -9,16 +10,34 @@ const PortfolioCalculator: React.FC = () => {
   const profit = ((investment / entryPrice) * exitPrice) - investment;
   const roi = (profit / investment) * 100;
 
+  const symbol = currency === 'JPY' ? '¥' : '$';
+
   return (
     <div className="glass rounded-2xl p-6">
-      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <i className="fas fa-calculator text-blue-400"></i>
-        収益計算シミュレーター
-      </h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold flex items-center gap-2">
+          <i className="fas fa-calculator text-blue-400"></i>
+          収益計算シミュレーター
+        </h3>
+        <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+          <button 
+            onClick={() => setCurrency('JPY')}
+            className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${currency === 'JPY' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            JPY
+          </button>
+          <button 
+            onClick={() => setCurrency('USD')}
+            className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${currency === 'USD' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            USD
+          </button>
+        </div>
+      </div>
       
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">投資額 (JPY)</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">投資額 ({currency})</label>
           <input 
             type="number" 
             value={investment}
@@ -29,7 +48,7 @@ const PortfolioCalculator: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">購入価格 (JPY)</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1">購入価格 ({currency})</label>
             <input 
               type="number" 
               value={entryPrice}
@@ -38,7 +57,7 @@ const PortfolioCalculator: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">目標価格 (JPY)</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1">目標価格 ({currency})</label>
             <input 
               type="number" 
               value={exitPrice}
@@ -52,7 +71,7 @@ const PortfolioCalculator: React.FC = () => {
           <div className="flex justify-between items-end mb-2">
             <span className="text-sm text-slate-400">見込み利益</span>
             <span className={`text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ¥{Math.round(profit).toLocaleString()}
+              {symbol}{Math.round(profit).toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between items-center">

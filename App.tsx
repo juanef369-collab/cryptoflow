@@ -284,14 +284,16 @@ const App: React.FC = () => {
               <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Resources</h4>
               <ul className="text-xs text-slate-400 space-y-2">
                 <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>トップへ戻る</li>
-                <li className="hover:text-emerald-400 cursor-pointer transition-colors">利用規約</li>
-                <li className="hover:text-emerald-400 cursor-pointer transition-colors">プライバシーポリシー</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => alert('利用規約は現在準備中です。')}>利用規約</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => alert('プライバシーポリシーは現在準備中です。')}>プライバシーポリシー</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => alert('免責事項: 投資は自己責任で行ってください。')}>免責事項</li>
               </ul>
             </div>
             <div className="space-y-3">
               <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Market</h4>
               <ul className="text-xs text-slate-400 space-y-2">
                 <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('home')}>価格チャート</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('portfolio')}>ポートフォリオ管理</li>
                 <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('ai')}>AI予測ツール</li>
                 <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('news')}>ニュースフィード</li>
               </ul>
