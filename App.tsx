@@ -9,13 +9,132 @@ import LiveNewsFeed from './components/LiveNewsFeed';
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedCoin, setSelectedCoin] = useState('BTC');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <>
+            {/* Real-time Dashboard Section */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 glass rounded-3xl p-8 relative overflow-hidden flex flex-col shadow-2xl border-emerald-500/5 transition-all hover:border-emerald-500/20">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                  <div>
+                    <h2 className="text-3xl font-black flex items-center gap-3">
+                      {selectedCoin} <span className="text-emerald-400">市場分析</span>
+                    </h2>
+                    <div className="flex items-center gap-3 mt-2">
+                       <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                         AI Grounding System Live
+                       </p>
+                       <span className="h-3 w-px bg-slate-800"></span>
+                       <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Global Data Feed</p>
+                    </div>
+                  </div>
+                  <div className="relative group">
+                    <select 
+                      value={selectedCoin}
+                      onChange={(e) => setSelectedCoin(e.target.value)}
+                      className="bg-slate-900 border border-slate-700/50 rounded-xl px-5 py-3 text-sm font-bold outline-none cursor-pointer hover:border-emerald-500/50 transition-all appearance-none pr-12 w-full md:w-auto"
+                      style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1em' }}
+                    >
+                      {SUPPORTED_COINS.map(coin => (
+                        <option key={coin.symbol} value={coin.symbol}>{coin.name} ({coin.symbol})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                
+                <MarketChart selectedCoin={selectedCoin} />
+                
+                <div className="grid grid-cols-3 gap-4 md:gap-8 mt-8 pt-8 border-t border-slate-800/50">
+                   <div>
+                     <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">現在の価格</p>
+                     <p className="text-xl md:text-2xl font-black tracking-tight">¥{selectedCoin === 'BTC' ? '7,120,500' : '412,420'}</p>
+                   </div>
+                   <div>
+                     <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">24H変動率</p>
+                     <p className="text-xl md:text-2xl font-black text-emerald-400">+{Math.random().toFixed(2)}%</p>
+                   </div>
+                   <div>
+                     <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">市場シグナル</p>
+                     <p className="text-xl md:text-2xl font-black text-blue-400 flex items-center gap-2">
+                       STRONG <i className="fas fa-arrow-trend-up text-sm"></i>
+                     </p>
+                   </div>
+                </div>
+              </div>
+
+              <AIAnalyst selectedCoin={selectedCoin} />
+            </section>
+
+            {/* Secondary Section */}
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="space-y-10">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-black tracking-tight">投資分析ツール</h3>
+                  <span className="h-px flex-1 mx-6 bg-slate-800/50"></span>
+                </div>
+                
+                <PortfolioCalculator />
+                
+                <div className="glass rounded-3xl p-8 bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-500/5 border-emerald-500/10 shadow-lg relative overflow-hidden group">
+                   <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                     <i className="fas fa-paper-plane text-6xl text-emerald-400"></i>
+                   </div>
+                   <div className="flex items-center gap-4 mb-6">
+                     <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">🚀</div>
+                     <div>
+                       <h4 className="font-black text-lg">AI プレミアム通信</h4>
+                       <p className="text-xs text-slate-400 leading-relaxed">毎朝、AIが厳選した市場動向と予測を配信中</p>
+                     </div>
+                   </div>
+                   <div className="flex flex-col sm:flex-row gap-3">
+                     <input type="email" placeholder="メールアドレスを入力" className="flex-1 bg-slate-900 border border-slate-700/50 rounded-xl px-5 py-4 text-sm focus:border-emerald-500 outline-none transition-all" />
+                     <button className="bg-emerald-600 hover:bg-emerald-500 px-8 py-4 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95">無料購読</button>
+                   </div>
+                </div>
+              </div>
+
+              <LiveNewsFeed />
+            </section>
+          </>
+        );
+      case 'news':
+        return (
+          <div className="max-w-4xl mx-auto">
+            <LiveNewsFeed />
+          </div>
+        );
+      case 'portfolio':
+        return (
+          <div className="max-w-4xl mx-auto space-y-10">
+            <h2 className="text-3xl font-black">ポートフォリオ管理</h2>
+            <PortfolioCalculator />
+          </div>
+        );
+      case 'ai':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <MarketChart selectedCoin={selectedCoin} />
+            </div>
+            <AIAnalyst selectedCoin={selectedCoin} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen pb-24 md:pb-0 md:pl-64 flex flex-col bg-[#0b1120] text-slate-100 selection:bg-emerald-500/30">
       {/* Sidebar - Desktop */}
       <aside className="hidden md:flex fixed left-0 top-0 h-full w-64 glass border-r border-slate-800/50 flex-col p-6 z-50">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-10 h-10 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <div className="flex items-center gap-3 mb-10 cursor-pointer group" onClick={() => setActiveTab('home')}>
+          <div className="w-10 h-10 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
             <i className="fas fa-chart-line text-white text-xl"></i>
           </div>
           <h1 className="text-xl font-black tracking-tight">CryptoFlow <span className="text-emerald-400 italic">JP</span></h1>
@@ -55,9 +174,45 @@ const App: React.FC = () => {
          <h1 className="text-lg font-black tracking-tighter">CryptoFlow <span className="text-emerald-400">JP</span></h1>
          <div className="flex gap-4 items-center">
             <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <i className="fas fa-bars text-slate-400 text-xl"></i>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-slate-400 text-xl`}></i>
+            </button>
          </div>
       </header>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}>
+          <aside className="w-64 h-full glass border-r border-slate-800/50 flex flex-col p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-10 cursor-pointer" onClick={() => { setActiveTab('home'); setIsMobileMenuOpen(false); }}>
+              <div className="w-10 h-10 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <i className="fas fa-chart-line text-white text-xl"></i>
+              </div>
+              <h1 className="text-xl font-black tracking-tight">CryptoFlow <span className="text-emerald-400 italic">JP</span></h1>
+            </div>
+
+            <nav className="flex-1 space-y-1">
+              {NAV_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
+                    activeTab === item.id 
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-inner' 
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="font-bold text-sm tracking-wide">{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </aside>
+        </div>
+      )}
 
       {/* Content Body */}
       <main className="flex-1 pt-24 md:pt-10 px-4 md:px-10 max-w-7xl mx-auto w-full space-y-8 pb-10">
@@ -68,95 +223,7 @@ const App: React.FC = () => {
            {/* <ins className="adsbygoogle" style={{display:'inline-block',width:'728px',height:'90px'}} data-ad-client="ca-pub-XXXXX" data-ad-slot="XXXXX"></ins> */}
         </div>
 
-        {/* Real-time Dashboard Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 glass rounded-3xl p-8 relative overflow-hidden flex flex-col shadow-2xl border-emerald-500/5 transition-all hover:border-emerald-500/20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-              <div>
-                <h2 className="text-3xl font-black flex items-center gap-3">
-                  {selectedCoin} <span className="text-emerald-400">市場分析</span>
-                </h2>
-                <div className="flex items-center gap-3 mt-2">
-                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                     AI Grounding System Live
-                   </p>
-                   <span className="h-3 w-px bg-slate-800"></span>
-                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Global Data Feed</p>
-                </div>
-              </div>
-              <div className="relative group">
-                <select 
-                  value={selectedCoin}
-                  onChange={(e) => setSelectedCoin(e.target.value)}
-                  className="bg-slate-900 border border-slate-700/50 rounded-xl px-5 py-3 text-sm font-bold outline-none cursor-pointer hover:border-emerald-500/50 transition-all appearance-none pr-12 w-full md:w-auto"
-                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1em' }}
-                >
-                  {SUPPORTED_COINS.map(coin => (
-                    <option key={coin.symbol} value={coin.symbol}>{coin.name} ({coin.symbol})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <MarketChart selectedCoin={selectedCoin} />
-            
-            <div className="grid grid-cols-3 gap-4 md:gap-8 mt-8 pt-8 border-t border-slate-800/50">
-               <div>
-                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">現在の価格</p>
-                 <p className="text-xl md:text-2xl font-black tracking-tight">¥{selectedCoin === 'BTC' ? '7,120,500' : '412,420'}</p>
-               </div>
-               <div>
-                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">24H変動率</p>
-                 <p className="text-xl md:text-2xl font-black text-emerald-400">+{Math.random().toFixed(2)}%</p>
-               </div>
-               <div>
-                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">市場シグナル</p>
-                 <p className="text-xl md:text-2xl font-black text-blue-400 flex items-center gap-2">
-                   STRONG <i className="fas fa-arrow-trend-up text-sm"></i>
-                 </p>
-               </div>
-            </div>
-          </div>
-
-          <AIAnalyst selectedCoin={selectedCoin} />
-        </section>
-
-        {/* Secondary Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="space-y-10">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-black tracking-tight">投資分析ツール</h3>
-              <span className="h-px flex-1 mx-6 bg-slate-800/50"></span>
-            </div>
-            
-            <PortfolioCalculator />
-            
-            <div className="glass rounded-3xl p-8 bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-500/5 border-emerald-500/10 shadow-lg relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                 <i className="fas fa-paper-plane text-6xl text-emerald-400"></i>
-               </div>
-               <div className="flex items-center gap-4 mb-6">
-                 <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">🚀</div>
-                 <div>
-                   <h4 className="font-black text-lg">AI プレミアム通信</h4>
-                   <p className="text-xs text-slate-400 leading-relaxed">毎朝、AIが厳選した市場動向と予測を配信中</p>
-                 </div>
-               </div>
-               <div className="flex flex-col sm:flex-row gap-3">
-                 <input type="email" placeholder="メールアドレスを入力" className="flex-1 bg-slate-900 border border-slate-700/50 rounded-xl px-5 py-4 text-sm focus:border-emerald-500 outline-none transition-all" />
-                 <button className="bg-emerald-600 hover:bg-emerald-500 px-8 py-4 rounded-xl text-sm font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95">無料購読</button>
-               </div>
-            </div>
-            
-            {/* AdSense Native In-Feed Slot */}
-            <div className="w-full glass rounded-3xl p-4 border border-dashed border-slate-800 bg-slate-900/10 flex items-center justify-center min-h-[200px]">
-               <p className="text-[10px] text-slate-700 font-black uppercase tracking-[0.2em]">In-Feed Recommendation</p>
-            </div>
-          </div>
-
-          <LiveNewsFeed />
-        </section>
+        {renderContent()}
       </main>
 
       {/* Footer & Global Status */}
