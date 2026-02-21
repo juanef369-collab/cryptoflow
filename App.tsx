@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { NAV_ITEMS, SUPPORTED_COINS } from './constants';
+import { getPriceDataPoints } from './services/geminiService';
 import MarketChart from './components/MarketChart';
 import AIAnalyst from './components/AIAnalyst';
 import PortfolioCalculator from './components/PortfolioCalculator';
@@ -10,6 +11,31 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedCoin, setSelectedCoin] = useState('BTC');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [priceData, setPriceData] = useState<{priceJpy: string, priceUsd: string, change24h: string}>({
+    priceJpy: '---',
+    priceUsd: '---',
+    change24h: '0.00'
+  });
+  const [loadingPrice, setLoadingPrice] = useState(false);
+
+  React.useEffect(() => {
+    const fetchPrice = async () => {
+      setLoadingPrice(true);
+      try {
+        const data = await getPriceDataPoints(selectedCoin);
+        setPriceData({
+          priceJpy: data.priceJpy || '---',
+          priceUsd: data.priceUsd || '---',
+          change24h: data.change24h || '0.00'
+        });
+      } catch (error) {
+        console.error("Error fetching price:", error);
+      } finally {
+        setLoadingPrice(false);
+      }
+    };
+    fetchPrice();
+  }, [selectedCoin]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -49,19 +75,25 @@ const App: React.FC = () => {
                 
                 <MarketChart selectedCoin={selectedCoin} />
                 
-                <div className="grid grid-cols-3 gap-4 md:gap-8 mt-8 pt-8 border-t border-slate-800/50">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mt-8 pt-8 border-t border-slate-800/50">
                    <div>
                      <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">現在の価格</p>
-                     <p className="text-xl md:text-2xl font-black tracking-tight">¥{selectedCoin === 'BTC' ? '7,120,500' : '412,420'}</p>
+                     <div className="flex flex-col">
+                       <p className="text-xl md:text-2xl font-black tracking-tight text-white">¥{priceData.priceJpy}</p>
+                       <p className="text-sm font-bold text-slate-400">${priceData.priceUsd}</p>
+                     </div>
                    </div>
                    <div>
                      <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">24H変動率</p>
-                     <p className="text-xl md:text-2xl font-black text-emerald-400">+{Math.random().toFixed(2)}%</p>
+                     <p className={`text-xl md:text-2xl font-black ${parseFloat(priceData.change24h) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                       {parseFloat(priceData.change24h) >= 0 ? '+' : ''}{priceData.change24h}%
+                     </p>
                    </div>
                    <div>
                      <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">市場シグナル</p>
                      <p className="text-xl md:text-2xl font-black text-blue-400 flex items-center gap-2">
-                       STRONG <i className="fas fa-arrow-trend-up text-sm"></i>
+                       {parseFloat(priceData.change24h) > 2 ? 'STRONG BUY' : parseFloat(priceData.change24h) > 0 ? 'BUY' : 'NEUTRAL'} 
+                       <i className={`fas ${parseFloat(priceData.change24h) >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'} text-sm`}></i>
                      </p>
                    </div>
                 </div>
@@ -235,9 +267,15 @@ const App: React.FC = () => {
               日本市場に特化した次世代AIクリプト・インテリジェンス。最新のデータ解析と市場予測を提供します。
             </p>
             <div className="flex justify-center md:justify-start gap-5 text-lg text-slate-400">
-              <i className="fab fa-twitter hover:text-emerald-400 cursor-pointer transition-colors"></i>
-              <i className="fab fa-line hover:text-green-500 cursor-pointer transition-colors"></i>
-              <i className="fab fa-discord hover:text-indigo-400 cursor-pointer transition-colors"></i>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
+                <i className="fab fa-twitter"></i>
+              </a>
+              <a href="https://line.me" target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition-colors">
+                <i className="fab fa-line"></i>
+              </a>
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">
+                <i className="fab fa-discord"></i>
+              </a>
             </div>
           </div>
           
@@ -245,17 +283,17 @@ const App: React.FC = () => {
             <div className="space-y-3">
               <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Resources</h4>
               <ul className="text-xs text-slate-400 space-y-2">
-                <li className="hover:text-emerald-400 cursor-pointer">利用規約</li>
-                <li className="hover:text-emerald-400 cursor-pointer">プライバシーポリシー</li>
-                <li className="hover:text-emerald-400 cursor-pointer">免責事項</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>トップへ戻る</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors">利用規約</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors">プライバシーポリシー</li>
               </ul>
             </div>
             <div className="space-y-3">
               <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Market</h4>
               <ul className="text-xs text-slate-400 space-y-2">
-                <li className="hover:text-emerald-400 cursor-pointer">価格チャート</li>
-                <li className="hover:text-emerald-400 cursor-pointer">AI予測ツール</li>
-                <li className="hover:text-emerald-400 cursor-pointer">ニュースフィード</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('home')}>価格チャート</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('ai')}>AI予測ツール</li>
+                <li className="hover:text-emerald-400 cursor-pointer transition-colors" onClick={() => setActiveTab('news')}>ニュースフィード</li>
               </ul>
             </div>
           </div>

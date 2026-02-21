@@ -27,12 +27,10 @@ const MarketChart: React.FC<MarketChartProps> = ({ selectedCoin }) => {
       // Fetch real-time info for the label/sources
       const result = await getPriceDataPoints(selectedCoin);
       if (result.sources) {
-        // Fix: According to Gemini API rules, website URLs are in groundingChunks.web.uri
         const extractedSources = (result.sources as any[])
-          .filter(s => s.web?.uri)
           .map(s => ({
-            title: s.web?.title || 'Source',
-            uri: s.web?.uri || ''
+            title: s.title || 'Source',
+            uri: s.url || ''
           }))
           .slice(0, 2);
         setSources(extractedSources);

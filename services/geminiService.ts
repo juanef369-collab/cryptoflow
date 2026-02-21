@@ -193,7 +193,7 @@ export const enhanceSummary = async (title: string, brief: string): Promise<stri
 };
 
 export const getPriceDataPoints = async (symbol: string) => {
-  const cacheKey = `price_v2_${symbol}`;
+  const cacheKey = `price_v3_${symbol}`;
   const cached = getCache<any>(cacheKey);
   if (cached) return cached;
 
@@ -202,17 +202,39 @@ export const getPriceDataPoints = async (symbol: string) => {
     const result = await runSerialized(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `${symbol} の現在の日本円価格と24時間の動向を教えてください。`,
-        config: { tools: [{ googleSearch: {} }] }
+        contents: `${symbol} の現在の日本円(JPY)価格と米ドル(USD)価格、および24時間の変動率を教えてください。JSON形式で返してください。`,
+        config: { 
+          tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              priceJpy: { type: Type.STRING },
+              priceUsd: { type: Type.STRING },
+              change24h: { type: Type.STRING },
+              summary: { type: Type.STRING },
+              sources: { 
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    title: { type: Type.STRING },
+                    url: { type: Type.STRING }
+                  },
+                  required: ["title", "url"]
+                }
+              }
+            },
+            required: ["priceJpy", "priceUsd", "change24h"]
+          }
+        }
       });
-      return {
-        text: response.text,
-        sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
-      };
+      const parsed = JSON.parse(response.text || "{}");
+      return parsed;
     }));
     setCache(cacheKey, result);
     return result;
   } catch {
-    return { text: "情報取得中...", sources: [] };
+    return { priceJpy: "---", priceUsd: "---", change24h: "0.00", summary: "情報取得中...", sources: [] };
   }
 };
