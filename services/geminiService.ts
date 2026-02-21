@@ -2,8 +2,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIInsight, NewsItem } from "../types";
 
-// Inicialización segura
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization of GoogleGenAI
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not defined. Please check your environment variables.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 // Duración de caché aumentada a 2 horas para máxima eficiencia en producción
 const CACHE_DURATION = 120 * 60 * 1000;
@@ -73,6 +84,7 @@ export const getMarketAnalysis = async (coinName: string, priceData: string): Pr
   if (cached) return cached;
 
   try {
+    const ai = getAI();
     const result = await runSerialized<AIInsight>(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -111,6 +123,7 @@ export const fetchLatestNews = async (): Promise<NewsItem[]> => {
   if (cached) return cached;
 
   try {
+    const ai = getAI();
     const news = await runSerialized<NewsItem[]>(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -164,6 +177,7 @@ export const enhanceSummary = async (title: string, brief: string): Promise<stri
   if (cached) return cached;
 
   try {
+    const ai = getAI();
     const result = await runSerialized<string>(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -184,6 +198,7 @@ export const getPriceDataPoints = async (symbol: string) => {
   if (cached) return cached;
 
   try {
+    const ai = getAI();
     const result = await runSerialized(() => fetchWithRetry(async () => {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
