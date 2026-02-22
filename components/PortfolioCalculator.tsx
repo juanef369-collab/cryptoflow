@@ -7,6 +7,23 @@ const PortfolioCalculator: React.FC = () => {
   const [entryPrice, setEntryPrice] = useState<number>(6500000);
   const [exitPrice, setExitPrice] = useState<number>(7000000);
 
+  // Simple conversion factors for simulation purposes
+  const handleCurrencyChange = (newCurrency: 'JPY' | 'USD') => {
+    if (newCurrency === currency) return;
+    
+    const rate = 150; // Approx JPY/USD
+    if (newCurrency === 'USD') {
+      setInvestment(prev => Math.round(prev / rate));
+      setEntryPrice(prev => Math.round(prev / rate));
+      setExitPrice(prev => Math.round(prev / rate));
+    } else {
+      setInvestment(prev => Math.round(prev * rate));
+      setEntryPrice(prev => Math.round(prev * rate));
+      setExitPrice(prev => Math.round(prev * rate));
+    }
+    setCurrency(newCurrency);
+  };
+
   const profit = ((investment / entryPrice) * exitPrice) - investment;
   const roi = (profit / investment) * 100;
 
@@ -21,13 +38,13 @@ const PortfolioCalculator: React.FC = () => {
         </h3>
         <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
           <button 
-            onClick={() => setCurrency('JPY')}
+            onClick={() => handleCurrencyChange('JPY')}
             className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${currency === 'JPY' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
           >
             JPY
           </button>
           <button 
-            onClick={() => setCurrency('USD')}
+            onClick={() => handleCurrencyChange('USD')}
             className={`px-3 py-1 text-[10px] font-black rounded-md transition-all ${currency === 'USD' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
           >
             USD
